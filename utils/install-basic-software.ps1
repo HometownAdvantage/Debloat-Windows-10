@@ -4,8 +4,16 @@
 # into your default drive's root directory.
 
 $packages = @(
-    "notepadplusplus.install"
-    "peazip.install"
+    #"dropbox"
+    #"arq"
+    #"sonos-controller"
+    #"slack"
+    #"dotnet3.5"
+    #"vcredist2008"
+    #"vcredist2013"
+    #"vcredist2015"
+    #"notepadplusplus.install"
+    #"peazip.install"
     #"7zip.install"
     #"aimp"
     #"audacity"
@@ -51,11 +59,11 @@ Register-ScheduledJob @ScheduledJob
 echo "Installing Packages"
 $packages | %{choco install $_ --force -y}
 
-echo "Installing Sysinternals Utilities to C:\Sysinternals"
-$download_uri = "https://download.sysinternals.com/files/SysinternalsSuite.zip"
-$wc = new-object net.webclient
-$wc.DownloadFile($download_uri, "/SysinternalsSuite.zip")
-Add-Type -AssemblyName "system.io.compression.filesystem"
-[io.compression.zipfile]::ExtractToDirectory("/SysinternalsSuite.zip", "/Sysinternals")
-echo "Removing zipfile"
-rm "/SysinternalsSuite.zip"
+#echo "Installing Sysinternals Utilities to C:\Sysinternals"
+#$download_uri = "https://download.sysinternals.com/files/SysinternalsSuite.zip"
+#$wc = new-object net.webclient
+#$wc.DownloadFile($download_uri, "/SysinternalsSuite.zip")
+#Add-Type -AssemblyName "system.io.compression.filesystem"
+#[io.compression.zipfile]::ExtractToDirectory("/SysinternalsSuite.zip", "/Sysinternals")
+#echo "Removing zipfile"
+#rm "/SysinternalsSuite.zip"
