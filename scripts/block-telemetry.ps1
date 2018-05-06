@@ -1,14 +1,20 @@
 #   Description:
 # This script blocks telemetry related domains via the hosts file and related
 # IPs via Windows Firewall.
+#
+# Please note that adding these domains may break certain software like iTunes
+# or Skype. As this issue is location dependent for some domains, they are not
+# commented by default. The domains known to cause issues marked accordingly.
+# Please see the related issue:
+# <https://github.com/W4RH4WK/Debloat-Windows-10/issues/79>
 
 Import-Module -DisableNameChecking $PSScriptRoot\..\lib\force-mkdir.psm1
 
-echo "Disabling telemetry via Group Policies"
+Write-Output "Disabling telemetry via Group Policies"
 force-mkdir "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
-sp "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "AllowTelemetry" 0
+Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "AllowTelemetry" 0
 
-echo "Adding telemetry domains to hosts file"
+Write-Output "Adding telemetry domains to hosts file"
 $hosts_file = "$env:systemroot\System32\drivers\etc\hosts"
 $domains = @(
     "184-86-53-99.deploy.static.akamaitechnologies.com"
@@ -53,7 +59,7 @@ $domains = @(
     "cds26.ams9.msecn.net"
     "choice.microsoft.com"
     "choice.microsoft.com.nsatc.net"
-    "c.msn.com"
+    "c.msn.com"                                 # can cause issues with Skype
     "compatexchange.cloudapp.net"
     "corpext.msitadfs.glbdns2.microsoft.com"
     "corp.sts.microsoft.com"
@@ -102,6 +108,7 @@ $domains = @(
     "settings-sandbox.data.microsoft.com"
     "settings-win.data.microsoft.com"
     "sls.update.microsoft.com.akadns.net"
+    "sls.update.microsoft.com.nsatc.net"
     "sqm.df.telemetry.microsoft.com"
     "sqm.telemetry.microsoft.com"
     "sqm.telemetry.microsoft.com.nsatc.net"
@@ -122,6 +129,7 @@ $domains = @(
     "vortex.data.microsoft.com"
     "vortex-sandbox.data.microsoft.com"
     "vortex-win.data.microsoft.com"
+    "cy2.vortex.data.microsoft.com.akadns.net"
     "watson.live.com"
     "watson.microsoft.com"
     "watson.ppe.telemetry.microsoft.com"
@@ -132,6 +140,41 @@ $domains = @(
     "www.bingads.microsoft.com"
     "www.go.microsoft.akadns.net"
     "www.msftncsi.com"
+    "client.wns.windows.com"
+    "wdcp.microsoft.com"
+    "dns.msftncsi.com"
+    "storeedgefd.dsx.mp.microsoft.com"
+    "login.live.com"
+    "wdcpalt.microsoft.com"
+    "settings-ssl.xboxlive.com"
+    "settings-ssl.xboxlive.com-c.edgekey.net"
+    "settings-ssl.xboxlive.com-c.edgekey.net.globalredir.akadns.net"
+    "e87.dspb.akamaidege.net"
+    "insiderservice.microsoft.com"
+    "insiderservice.trafficmanager.net"
+    "e3843.g.akamaiedge.net"
+    "flightingserviceweurope.cloudapp.net"
+    "sls.update.microsoft.com" # wird ignoriert res. umgangen
+    "static.ads-twitter.com"
+    "www-google-analytics.l.google.com"
+    "p.static.ads-twitter.com"
+    "hubspot.net.edge.net"
+    "e9483.a.akamaiedge.net"
+
+    #"www.google-analytics.com"
+    #"padgead2.googlesyndication.com"
+	#"mirror1.malwaredomains.com"
+	#"mirror.cedia.org.ec"
+    "stats.g.doubleclick.net"
+    "stats.l.doubleclick.net"
+    "adservice.google.de"
+    "adservice.google.com"
+    "googleads.g.doubleclick.net"
+    "pagead46.l.doubleclick.net"
+    "hubspot.net.edgekey.net" #trotz Deaktivierung von hubspot
+    "insiderppe.cloudapp.net" # Feedback-Hub
+    "livetileedge.dsx.mp.microsoft.com"
+    
 
     # extra
     "fe2.update.microsoft.com.akadns.net"
@@ -144,20 +187,20 @@ $domains = @(
     "watson.telemetry.microsoft.com",
     "watson.telemetry.microsoft.com.nsatc.net"
     "wes.df.telemetry.microsoft.com"
-    "ui.skype.com",
-    "pricelist.skype.com"
-    "apps.skype.com"
+    "ui.skype.com",                             # can cause issues with Skype
+    "pricelist.skype.com"                       # can cause issues with Skype
+    "apps.skype.com"                            # can cause issues with Skype
     "m.hotmail.com"
-    "s.gateway.messenger.live.com"
+    "s.gateway.messenger.live.com"              # can cause issues with Skype
 )
-echo "" | Out-File -Encoding ASCII -Append $hosts_file
+Write-Output "" | Out-File -Encoding ASCII -Append $hosts_file
 foreach ($domain in $domains) {
     if (-Not (Select-String -Path $hosts_file -Pattern $domain)) {
-        echo "0.0.0.0 $domain" | Out-File -Encoding ASCII -Append $hosts_file
+        Write-Output "0.0.0.0 $domain" | Out-File -Encoding ASCII -Append $hosts_file
     }
 }
 
-echo "Adding telemetry ips to firewall"
+Write-Output "Adding telemetry ips to firewall"
 $ips = @(
     "134.170.30.202"
     "137.116.81.24"
@@ -170,6 +213,7 @@ $ips = @(
     "65.39.117.230"
     "65.52.108.33"
     "65.55.108.23"
+    "64.4.54.254"
 )
 Remove-NetFirewallRule -DisplayName "Block Telemetry IPs" -ErrorAction SilentlyContinue
 New-NetFirewallRule -DisplayName "Block Telemetry IPs" -Direction Outbound `

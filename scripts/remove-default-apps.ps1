@@ -5,10 +5,10 @@
 Import-Module -DisableNameChecking $PSScriptRoot\..\lib\take-own.psm1
 Import-Module -DisableNameChecking $PSScriptRoot\..\lib\force-mkdir.psm1
 
-echo "Elevating privileges for this process"
+Write-Output "Elevating privileges for this process"
 do {} until (Elevate-Privileges SeTakeOwnershipPrivilege)
 
-echo "Uninstalling default apps"
+Write-Output "Uninstalling default apps"
 $apps = @(
     # default Windows 10 apps
     "Microsoft.3DBuilder"
@@ -16,44 +16,59 @@ $apps = @(
     "Microsoft.BingFinance"
     "Microsoft.BingNews"
     "Microsoft.BingSports"
+    "Microsoft.BingTranslator"
     "Microsoft.BingWeather"
-    "Microsoft.FreshPaint"
-    "Microsoft.Getstarted"
+    #"Microsoft.FreshPaint"
+    "Microsoft.Microsoft3DViewer"
     "Microsoft.MicrosoftOfficeHub"
     "Microsoft.MicrosoftSolitaireCollection"
+    "Microsoft.MicrosoftPowerBIForWindows"
+    "Microsoft.MinecraftUWP"
     #"Microsoft.MicrosoftStickyNotes"
+    "Microsoft.NetworkSpeedTest"
     "Microsoft.Office.OneNote"
     #"Microsoft.OneConnect"
-    #"Microsoft.People"
+    "Microsoft.People"
+    "Microsoft.Print3D"
     "Microsoft.SkypeApp"
-    "Microsoft.Windows.Photos"
+    "Microsoft.Wallet"
+    #"Microsoft.Windows.Photos"
     "Microsoft.WindowsAlarms"
     #"Microsoft.WindowsCalculator"
     "Microsoft.WindowsCamera"
+    "microsoft.windowscommunicationsapps"
     "Microsoft.WindowsMaps"
     "Microsoft.WindowsPhone"
     "Microsoft.WindowsSoundRecorder"
     #"Microsoft.WindowsStore"
-    #"Microsoft.XboxApp"
+    "Microsoft.XboxApp"
+	"Microsoft.XboxGameOverlay"
+    "Microsoft.XboxIdentityProvider"
+    "Microsoft.XboxSpeechToTextOverlay"
     "Microsoft.ZuneMusic"
     "Microsoft.ZuneVideo"
-    "microsoft.windowscommunicationsapps"
-    "Microsoft.MinecraftUWP"
-
+    
+    
     # Threshold 2 apps
     "Microsoft.CommsPhone"
     "Microsoft.ConnectivityStore"
+    "Microsoft.GetHelp"
+    "Microsoft.Getstarted"
     "Microsoft.Messaging"
     "Microsoft.Office.Sway"
     "Microsoft.OneConnect"
     "Microsoft.WindowsFeedbackHub"
 
+    # Creators Update apps
+    "Microsoft.Microsoft3DViewer"
+    #"Microsoft.MSPaint"
 
     #Redstone apps
     "Microsoft.BingFoodAndDrink"
     "Microsoft.BingTravel"
     "Microsoft.BingHealthAndFitness"
     "Microsoft.WindowsReadingList"
+
 
     # non-Microsoft
     "46928bounde.EclipseManager"
@@ -78,6 +93,19 @@ $apps = @(
     "Facebook.Facebook"
     "flaregamesGmbH.RoyalRevolt2"
     "Playtika.CaesarsSlotsFreeCasino"
+    "A278AB0D.MarchofEmpires"
+    "KeeperSecurityInc.Keeper"
+    "ThumbmunkeysLtd.PhototasticCollage"
+    "XINGAG.XING"
+    "89006A2E.AutodeskSketchBook"
+    "D5EA27B7.Duolingo-LearnLanguagesforFree"
+    "46928bounde.EclipseManager"
+    "ActiproSoftwareLLC.562882FEEB491" # next one is for the Code Writer from Actipro Software LLC
+    "DolbyLaboratories.DolbyAccess"
+    "SpotifyAB.SpotifyMusic"
+    "A278AB0D.DisneyMagicKingdoms"
+    "WinZipComputing.WinZipUniversal"
+
 
     # apps which cannot be removed using Remove-AppxPackage
     #"Microsoft.BioEnrollment"
@@ -90,15 +118,15 @@ $apps = @(
 )
 
 foreach ($app in $apps) {
-    echo "Trying to remove $app"
+    Write-Output "Trying to remove $app"
 
-    Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage
+    Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers
 
     Get-AppXProvisionedPackage -Online |
-        where DisplayName -EQ $app |
+        Where-Object DisplayName -EQ $app |
         Remove-AppxProvisionedPackage -Online
 }
 
 # Prevents "Suggested Applications" returning
 force-mkdir "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Cloud Content"
-sp "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Cloud Content" "DisableWindowsConsumerFeatures" 1
+Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Cloud Content" "DisableWindowsConsumerFeatures" 1
