@@ -1,3 +1,50 @@
+# David Modifications
+
+## Backup First!
+* Get a clean image via Macrium Reflect. There is no Undo with these scripts.
+
+## Before running anything, Merge the Latest Version
+* From: https://github.com/W4RH4WK/Debloat-Windows-10/
+* To: https://github.com/HometownAdvantage/Debloat-Windows-10
+
+## Usage
+1. Install all available updates for your system.
+2. Clone https://github.com/HometownAdvantage/Debloat-Windows-10.
+3. Switch to HEAD of David or VirtualMachines or Workstations.
+4. Modify anything in scripts or utils folder that should be changed.
+4. Run these scripts from a PowerShell with administrator priviledges (Explorer
+   `Files > Open Windows PowerShell > Open Windows PowerShell as
+   administrator`):
+~~~~
+Set-ExecutionPolicy Unrestricted
+cd C:\Projects\Debloat-Windows-10\
+ls -Recurse *.ps1 | Unblock-File
+ls -Recurse *.psm1 | Unblock-File
+utils\install-basic-software.ps1
+scripts\optimize-user-interface.ps1
+scripts\optimize-windows-update.ps1
+scripts\disable-services.ps1
+scripts\remove-default-apps.ps1
+Restart-Computer
+~~~~
+
+### Disabling Windows Defender
+Do not uninstall/remove Windows Defender. Do not disable Windows Defender unless you have a better alternative. If you want to disable Windows Defender, you need to run the script twice.
+~~~~
+cd C:\Projects\Debloat-Windows-10\
+scripts/disable-windows-defender.ps1
+Restart-Computer
+scripts/disable-windows-defender.ps1
+Restart-Computer
+~~~~
+
+## David Notes
+
+* Do not uninstall/remove OneDrive. It sucks, but it's tentacles are deep within Windows and removing it causes other apps not to work. Just disable it through Group Policy.
+  * [Microsoft support article on turning off OneDrive] (https://support.office.com/en-us/article/Turn-off-or-uninstall-OneDrive-f32a17ce-3336-40fe-9c38-6efb09f944b0?ui=en-US&rs=en-US&ad=US&fromAR=1)
+* Do not Block Telemetry until you are 100% sure what you are doing.
+
+
 # Debloat Windows 10
 
 This project collects Powershell scripts which help to *debloat* Windows 10,
